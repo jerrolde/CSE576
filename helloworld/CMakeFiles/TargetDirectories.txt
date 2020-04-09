@@ -1,0 +1,3 @@
+/home/jerick/CSE576/helloworld/CMakeFiles/rebuild_cache.dir
+/home/jerick/CSE576/helloworld/CMakeFiles/hello.dir
+/home/jerick/CSE576/helloworld/CMakeFiles/edit_cache.dir
