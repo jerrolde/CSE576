@@ -1,0 +1,4 @@
+/home/jerick/CSE576/hw1/CMakeFiles/rebuild_cache.dir
+/home/jerick/CSE576/hw1/CMakeFiles/edit_cache.dir
+/home/jerick/CSE576/hw1/CMakeFiles/uwimg++.dir
+/home/jerick/CSE576/hw1/CMakeFiles/test0.dir
