@@ -113,10 +113,35 @@ int main(int argc, char **argv)
   // Image manipulation for fun testing.
   
   Image im2 = load_image("data/dog.jpg");
+
+  Image im_gray = rgb_to_grayscale(im2);
+  im_gray.save_image("output/grayscale");
+
+  Image im_shift = load_image("data/dog.jpg");
+  shift_image(im_shift, 0, .4);
+  shift_image(im_shift, 1, .4);
+  shift_image(im_shift, 2, .4);
+  im_shift.save_image("output/shift_result");
+
+  Image im_clamp;
+  copy_image(im_clamp, im_shift);
+  clamp_image(im_clamp);
+  im_clamp.save_image("output/clamp_result");
+
+  // 6-7. Colorspace and saturation
+  Image im_hsv = load_image("data/dog.jpg");
+  rgb_to_hsv(im_hsv);
+  shift_image(im_hsv, 1, .2);
+  clamp_image(im_hsv);
+  hsv_to_rgb(im_hsv);
+  im_hsv.save_image("output/colorspace_result");
+  
   for (int i=0; i<im2.w; i++)
       for (int j=0; j<im2.h; j++)
           im2(i, j, 0) = 0;
   im2.save_image("output/pixel_modifying_output");
+
+
   
   // Running example tests
   
