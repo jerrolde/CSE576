@@ -5,3 +5,4 @@ cd build
 cmake ..
 cd ..
 make -C ./build/ -j8
+./test1

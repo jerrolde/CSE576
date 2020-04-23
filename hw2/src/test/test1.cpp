@@ -14,6 +14,7 @@ void test_nn_resize()
   
   Image im2 = load_image("data/dog.jpg");
   Image resized2 = nearest_resize(im2, 713, 467);
+  //resized2.save_image("TESTIMAGE.JPG");
   Image gt2 = load_image("data/dog-resize-nn.png");
   TEST(same_image(resized2, gt2));
   }
@@ -27,6 +28,7 @@ void test_bl_resize()
 
   Image im2 = load_image("data/dog.jpg");
   Image resized2 = bilinear_resize(im2, 713, 467);
+  resized2.save_image("TESTIMAGE.JPG");
   Image gt2 = load_image("data/dog-resize-bil.png");
   TEST(same_image(resized2, gt2));
   }
