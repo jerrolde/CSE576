@@ -51,7 +51,6 @@ void test_highpass_filter()
   Image f = make_highpass_filter();
   Image blur = convolve_image(im, f, false);
   blur.clamp();
-  blur.save_image("highpass.JPG");
   
   Image gt = load_image("data/dog-highpass.png");
   TEST(same_image(blur, gt));
@@ -63,7 +62,6 @@ void test_emboss_filter()
   Image f = make_emboss_filter();
   Image blur = convolve_image(im, f, true);
   blur.clamp();
-  blur.save_image("emboss.JPG");
   
   Image gt = load_image("data/dog-emboss.png");
   TEST(same_image(blur, gt));
@@ -75,7 +73,6 @@ void test_sharpen_filter()
   Image f = make_sharpen_filter();
   Image blur = convolve_image(im, f, true);
   blur.clamp();
-  blur.save_image("sharp.JPG");
   
   Image gt = load_image("data/dog-sharpen.png");
   TEST(same_image(blur, gt));
@@ -87,7 +84,6 @@ void test_convolution()
   Image f = make_box_filter(7);
   Image blur = convolve_image(im, f, true);
   blur.clamp();
-  blur.save_image("blur.JPG");
   
   Image gt = load_image("data/dog-box7.png");
   TEST(same_image(blur, gt));
@@ -141,6 +137,7 @@ void test_frequency_image()
   
   lfreq.clamp();
   hfreq.clamp();
+
   TEST(same_image(lfreq, low_freq));
   TEST(same_image(hfreq, high_freq));
   TEST(same_image(reconstruct, im));
@@ -152,7 +149,6 @@ void test_sobel()
   pair<Image,Image> res = sobel_image(im);
   Image mag = res.first;
   Image theta = res.second;
-  
   feature_normalize(mag);
   feature_normalize(theta);
   
