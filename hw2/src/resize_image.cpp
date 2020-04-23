@@ -93,8 +93,6 @@ Image bilinear_resize(const Image& im, int w, int h)
   float ratio_x, ratio_y;
   ratio_x = (float) im.w / (float) w;
   ratio_y = (float) im.h / (float) h;
-
-  printf("im.w = %i, im.h = %i, w = %i, h = %i, ratio_x = %f, ratio_y = %f", im.w, im.h, w, h, ratio_x, ratio_y);
  
   int x, y, c;
   float x_new, y_new, pixel;

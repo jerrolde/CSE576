@@ -12,8 +12,30 @@
 void l1_normalize(Image& im)
   {
   
-  // TODO: Normalize each channel
-  NOT_IMPLEMENTED();
+  double norm;
+  float new_pixel;
+  int x, y, c;
+
+  for (c = 0; c < im.c; c++)
+  {
+    norm = 0;
+    for (x = 0; x < im.w; x++)
+    {
+      for (y = 0; y < im.h; y++)
+      {
+        norm += im.clamped_pixel(x, y, c);
+      }
+    }
+
+    for (x = 0; x < im.w; x++)
+    {
+      for (y = 0; y < im.h; y++)
+      {
+        new_pixel = im.clamped_pixel(x, y, c) / norm;
+        im.set_pixel(x, y, c, new_pixel);
+      }
+    }
+  }
   
   
   }
@@ -25,10 +47,22 @@ Image make_box_filter(int w)
   {
   assert(w%2); // w needs to be odd
   
-  // TODO: Implement the filter
-  NOT_IMPLEMENTED();
+  Image im(w, w, 1);
+
+  int x, y;
+  float val;
+
+  val = 1.0 / (w * w);
+
+  for (int x = 0; x < w; x++)
+  {
+    for (int y = 0; y < w; y++)
+    {
+      im.set_pixel(x, y, 0, val);
+    }
+  }
   
-  return Image(1,1,1);
+  return im;
   }
 
 // HW1 #2.2
@@ -45,20 +79,66 @@ Image convolve_image(const Image& im, const Image& filter, bool preserve)
   
   // TODO: Make sure you set the sizes of ret properly. Use ret=Image(w,h,c) to reset ret
   // TODO: Do the convolution operator
-  NOT_IMPLEMENTED();
-  
-  // Make sure to return ret and not im. This is just a placeholder
-  return im;
+
+  ret = Image(im.w, im.h, im.c);
+
+  int x, y, c, i, j;
+  float old_pixel, new_pixel;
+  for (c = 0; c < im.c; c++)
+  {
+    for (x = 0; x < im.w; x++)
+    {
+      for (y = 0; y < im.h; y++)
+      {
+        for (i = 0 - (filter.w/2); i <= (filter.w/2); i++)
+        {
+          for (j = 0 - (filter.h/2); j <= (filter.h/2); j++)
+          {
+            old_pixel = im.clamped_pixel(x + i, y + j, c);
+            new_pixel = old_pixel * filter.clamped_pixel(i + filter.w/2, j + filter.h/2, 0);
+            ret.set_pixel(x, y, c, ret.clamped_pixel(x, y, c) + new_pixel);
+          }
+        }
+      }
+    }
+  }
+
+  if (!preserve)
+  {
+    Image new_ret;
+    new_ret = Image(ret.w, ret.h, 1);
+    for (c = 0; c < ret.c; c++)
+    {
+      for (x = 0; x < ret.w; x++)
+      {
+        for (y = 0; y < ret.h; y++)
+        {
+          new_ret.set_pixel(x, y, 0, new_ret.clamped_pixel(x, y, 0) + ret.clamped_pixel(x, y, c));
+        }
+      }
+    }
+
+    return new_ret;
+  }
+
+  return ret;
   }
 
 // HW1 #2.3
 // returns basic 3x3 high-pass filter
 Image make_highpass_filter()
   {
-  // TODO: Implement the filter
-  NOT_IMPLEMENTED();
+
+  Image filter;
+
+  filter = Image(3, 3, 1);
+  filter.set_pixel(1,0,0,-1.0);
+  filter.set_pixel(0,1,0,-1.0);
+  filter.set_pixel(2,1,0,-1.0);
+  filter.set_pixel(1,2,0,-1.0);
+  filter.set_pixel(1,1,0,4.0);
   
-  return Image(1,1,1);
+  return filter;
   
   }
 
@@ -66,10 +146,17 @@ Image make_highpass_filter()
 // returns basic 3x3 sharpen filter
 Image make_sharpen_filter()
   {
-  // TODO: Implement the filter
-  NOT_IMPLEMENTED();
+
+  Image filter;
+
+  filter = Image(3, 3, 1);
+  filter.set_pixel(1,0,0,-1.0);
+  filter.set_pixel(0,1,0,-1.0);
+  filter.set_pixel(2,1,0,-1.0);
+  filter.set_pixel(1,2,0,-1.0);
+  filter.set_pixel(1,1,0,5.0);
   
-  return Image(1,1,1);
+  return filter;
   
   }
 
@@ -77,10 +164,18 @@ Image make_sharpen_filter()
 // returns basic 3x3 emboss filter
 Image make_emboss_filter()
   {
-  // TODO: Implement the filter
-  NOT_IMPLEMENTED();
+  Image filter;
+
+  filter = Image(3, 3, 1);
+  filter.set_pixel(0,0,0,-2.0);
+  filter.set_pixel(1,0,0,-1.0);
+  filter.set_pixel(0,1,0,-1.0);
+  filter.set_pixel(2,1,0,1.0);
+  filter.set_pixel(1,2,0,1.0);
+  filter.set_pixel(1,1,0,1.0);
+  filter.set_pixel(2,2,0,2.0);
   
-  return Image(1,1,1);
+  return filter;
   
   }
 

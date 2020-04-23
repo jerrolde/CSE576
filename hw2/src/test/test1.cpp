@@ -14,7 +14,6 @@ void test_nn_resize()
   
   Image im2 = load_image("data/dog.jpg");
   Image resized2 = nearest_resize(im2, 713, 467);
-  //resized2.save_image("TESTIMAGE.JPG");
   Image gt2 = load_image("data/dog-resize-nn.png");
   TEST(same_image(resized2, gt2));
   }
@@ -28,7 +27,6 @@ void test_bl_resize()
 
   Image im2 = load_image("data/dog.jpg");
   Image resized2 = bilinear_resize(im2, 713, 467);
-  resized2.save_image("TESTIMAGE.JPG");
   Image gt2 = load_image("data/dog-resize-bil.png");
   TEST(same_image(resized2, gt2));
   }
@@ -53,6 +51,8 @@ void test_highpass_filter()
   Image f = make_highpass_filter();
   Image blur = convolve_image(im, f, false);
   blur.clamp();
+  blur.save_image("highpass.JPG");
+  
   Image gt = load_image("data/dog-highpass.png");
   TEST(same_image(blur, gt));
   }
@@ -63,6 +63,7 @@ void test_emboss_filter()
   Image f = make_emboss_filter();
   Image blur = convolve_image(im, f, true);
   blur.clamp();
+  blur.save_image("emboss.JPG");
   
   Image gt = load_image("data/dog-emboss.png");
   TEST(same_image(blur, gt));
@@ -74,6 +75,7 @@ void test_sharpen_filter()
   Image f = make_sharpen_filter();
   Image blur = convolve_image(im, f, true);
   blur.clamp();
+  blur.save_image("sharp.JPG");
   
   Image gt = load_image("data/dog-sharpen.png");
   TEST(same_image(blur, gt));
@@ -85,6 +87,7 @@ void test_convolution()
   Image f = make_box_filter(7);
   Image blur = convolve_image(im, f, true);
   blur.clamp();
+  blur.save_image("blur.JPG");
   
   Image gt = load_image("data/dog-box7.png");
   TEST(same_image(blur, gt));
