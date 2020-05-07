@@ -1,39 +1,39 @@
 2.2.1 Question
 Q: Why might we be interested in both training accuracy and testing accuracy? What do these two numbers tell us about our current model?
-A:
+A: The training accuracy tells us how accurate our model is for the data that it was trained on. We want this to be high, but if it's too high, our model might  be overfit. We can see if this is the case by checking the testing accuracy. If we have high training accuracy and low testing accuracy, our model is likely overfit and won't generalize well.
 
 2.2.2 Question
 Q: Try varying the model parameter for learning rate to different powers of 10 (i.e. 10^1, 10^0, 10^-1, 10^-2, 10^-3) and training the model. What patterns do you see and how does the choice of learning rate affect both the loss during training and the final model accuracy?
-A:
+A: Learning rate = 10 is far too big; loss grows for a few iterations and then becomes NaN. Rate = 1 works, but the loss clearly oscillates a lot. Test accuracy is 88%. Rate = 0.1 works a lot better, and produces a test accuracy of 91%. Rate = 0.01 doesn't get the loss function as low as 0.1, and the final test accuracy is 90%. Rate = 0.001 is clearly too slow - the loss is continuing to decrease when the 1,000 iterates of training ends, with a final test accuracy of 86%.
 
 2.2.3 Question
 Q: Try varying the parameter for weight decay to different powers of 10: (10^0, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5). How does weight decay affect the final model training and test accuracy?
-A:
+A: Decay = 1.0 doesn't work well. The loss quickly settles to ~1.6, which is high. Test accuracy is 77%. Decay = 0.1 settles to a loss of ~0.7, and test accuracy of 86%. Decay = 0.01 approaches the results attained previously, with a test accuracy of 90%. Smaller values of decay do not impact the results much, with the final test accuracy approaching 91%.
 
 2.3.1 Question
 Q: Currently the model uses a logistic activation for the first layer. Try using all the other activation functions we programmed. How well do they perform? What's best?
-A:
+A: Using the provided parameters, all of the activation functions perform well with the exception of softmax, which achieves only 31% accuracy. Logistic accuracy is 89%, linear is 91%, and tanh, relu, and lrelu are all around 92% accuracy.
 
 2.3.2 Question
 Q: Using the same activation, find the best (power of 10) learning rate for your model. What is the training accuracy and testing accuracy?
-A:
+A: Using RELU activation, I tried power of 10 learning rates between 10^2 and 10^-5 and found that a learning rate of 10^-2 is best. Training accuracy is 91.2% and test accuracy is 91.4%.
 
 2.3.3 Question
 Q: Right now the regularization parameter `decay` is set to 0. Try adding some decay to your model. What happens, does it help? Why or why not may this be?
-A:
+A: Testing decay vales from 10^2 to 10^-10, none of them significantly improve the results. In the best cases, test accuracy increases from 91.4% to ~91.6%, but this doesn't seem to correlate to the value of decay in any meaningful way. Decay should help provent overfitting, but that doesn't seem to be an issue with the current parameters.
 
 2.3.4 Question
 Q: Modify your model so it has 3 layers instead of 2. The layers should be `inputs -> 64`, `64 -> 32`, and `32 -> outputs`. Also modify your model to train for 3000 iterations instead of 1000. Look at the training and testing accuracy for different values of decay (powers of 10, 10^-4 -> 10^0). Which is best? Why?
-A:
+A: Using an extra layer as described with RELU activation, decay seems to help a bit more. The best model tested uses decay = 10^-4, with a training accuracy of 92.9%, and test accuracy of 93.0%. The decay parameter helps prevent overfitting.
 
 2.3.5 Question
 Q: Modify your model so it has 4 layers instead of 2. The layers should be `inputs -> 128`, `128 -> 64`, `64 -> 32`, and `32 -> outputs`. Do the same analysis as in 2.3.4.
-A:
+A:  With 4 layers and RELU activation, decay doesn't seem to help at all. The best results were at decay = 10^-3, 10^-6, and 10^-9, which all are close to 93% training and test accuracy.
 
 2.3.6 Question
 Q: Use the 2 layer model with the best activation for layer 1 but linear activation for layer 2. Now implement the functions `l1_loss` and `l2_loss` and change the necessary code in `classifier.cpp` to use these loss functions. Observe the output values and accuracy of the model and write down your observations for both the loss functions compared to cross-entropy loss. P.S. L2 and L1 losses are generally used for regression, but this is a classification problem.
-A:
+A: Using an inner TANH layer and an outer linear layer, cross entropy loss gives a training accuracyof 26.6% and test accuracy of 26.3%. Switching to L1 loss, we have a training accuracy of 77.3% and test accuracy of 78.4%. Finally, with L2 accuracy, we have 93.2% training accuracy and 93.2% test accuracy. Here, L2 loss works very well.
 
 3.2.1 Question
 Q: How well does your network perform on the CIFAR dataset?
-A:
+A: The L2 loss model from 2.3.6 achieves 25% accuracy on CIFAR. Switching to the 4 layer model and setting training rate to 0.01, I get 38.5% training and 37.6% test accuracy.

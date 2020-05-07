@@ -121,11 +121,11 @@ Matrix Layer::backward(const Matrix &grad_y) {
 void update_layer(Layer &l, double rate, double momentum, double decay) {
   // TODO: calculate the weight updates
   // Hint: Calculate Δw_t = dL/dw_t - λw_t + mΔw_{t-1} and save it to l.v
-  NOT_IMPLEMENTED();
+  l.v = l.grad_w - decay * l.w + momentum * l.v;
 
   // TODO: update the weights and save to l.w.
   // Hint: w_{t+1} = w_t + ηΔw_t
-  NOT_IMPLEMENTED();
+  l.w = l.w + rate * l.v;
 }
 
 // DO NOT MODIFY.
@@ -229,11 +229,14 @@ double cross_entropy_loss(const Matrix &y, const Matrix &p) {
 // returns: average L2 loss over data points
 double l2_loss(const Matrix &y, const Matrix &p) {
   assert_same_size(y, p);
-  // TODO
-
-  NOT_IMPLEMENTED();
-
-  return 0;
+  double sum = 0;
+  for (int i = 0; i < y.rows; i++) {
+    for (int j = 0; j < y.cols; j++) {
+      double diff = y(i, j) - p(i, j);
+      sum += pow(diff, 2);
+    }
+  }
+  return sum / y.rows;
 }
 
 // Calculate the L1 loss for a set of predictions
@@ -242,11 +245,14 @@ double l2_loss(const Matrix &y, const Matrix &p) {
 // returns: average L1 loss over data points
 double l1_loss(const Matrix &y, const Matrix &p) {
   assert_same_size(y, p);
-  // TODO
-
-  NOT_IMPLEMENTED();
-
-  return 0;
+  double sum = 0;
+  for (int i = 0; i < y.rows; i++) {
+    for (int j = 0; j < y.cols; j++) {
+      double diff = y(i, j) - p(i, j);
+      sum += diff > 1 ? diff - 0.5 : 0.5 * pow(diff, 2);
+    }
+  }
+  return sum / y.rows;
 }
 
 // Calculate the loss for a set of predictions
@@ -297,7 +303,7 @@ void Model::train(const Data &data, int batch_size, int iters, double rate, doub
     double loss = this->compute_loss(batch.y, y);
     double accu = this->accuracy2(batch, y);
     
-    printf("Iteration: %6d: Loss: %12.6lf   Batch Accuracy: %8.3lf \n", iter, loss, accu);
+    if (iter % 100 == 5) printf("Iteration: %6d: Loss: %12.6lf   Batch Accuracy: %8.3lf \n", iter, loss, accu);
     
     // partial derivative of loss dL/dprob
     Matrix dLoss=this->loss_derivative(batch.y, y)/batch_size;

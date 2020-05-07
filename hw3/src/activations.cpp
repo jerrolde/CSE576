@@ -187,7 +187,7 @@ Matrix forward_softmax(const Matrix &matrix) {
     for (int j = 0; j < activated.cols; j++)
     {
       double x = activated[i][j];
-      double fx = x / sum;
+      double fx = sum == 0 ? 0 : x / sum;
       activated[i][j] = fx;
     }
   }
@@ -217,7 +217,7 @@ Matrix softmax_jacobian(const Matrix &out_row) {
 
 // Computes the backwards pass for the softmax function.
 Matrix backward_softmax(const Matrix &out, const Matrix &prev_grad) {
-  printf("backward softmax\n");
+  //printf("backward softmax\n");
   assert_same_size(prev_grad, out);
   Matrix grad = prev_grad;
   // Multiply previous gradient with Jacobian.

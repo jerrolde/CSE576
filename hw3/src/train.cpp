@@ -46,35 +46,45 @@ Model softmax_model(int inputs, int outputs) {
 
 Model neural_net(int inputs, int outputs) {
   return {{
-              Layer(inputs, 32, LOGISTIC),
+              Layer(inputs, 128, RELU),
+              Layer(128, 64, RELU),
+              Layer(64, 32, RELU),
               Layer(32, outputs, SOFTMAX)
-          },  CROSS_ENTROPY};
+          },  L2_LOSS};
 }
 
 int main(int argc, char **argv) {
   // Set the verbose flag to true to enable debug prints!
-  set_verbose(true);
+  set_verbose(false);
 
   printf("Loading dataset\n");
-  Dataset d = get_mnist();
-  //Dataset d = get_cifar10();
+  // Dataset d = get_mnist();
+  Dataset d = get_cifar10();
 
   double batch = 128;
-  double iters = 1000;
+  double iters = 3000;
   double rate = .01;
   double momentum = .9;
   double decay = .0;
   
-  Model model = softmax_model(d.train.X.cols, d.train.y.cols);
+  // Model model = softmax_model(d.train.X.cols, d.train.y.cols);
   //Model model = neural_net(d.train.X.cols,d.train.y.cols);
-  
   printf("Training model...\n");
-  
-  model.train(d.train, batch, iters, rate, momentum, decay);
+  // model.train(d.train, batch, iters, rate, momentum, decay);
+  // printf("evaluating model...\n");
+  // printf("training accuracy: %lf\n", model.accuracy(d.train));
+  // printf("test accuracy:     %lf\n", model.accuracy(d.test));
 
-  printf("evaluating model...\n");
-  printf("training accuracy: %lf\n", model.accuracy(d.train));
-  printf("test accuracy:     %lf\n", model.accuracy(d.test));
+  for (double i = 0.1; i > -6; i -= 0.01)
+  {
+    rate = i;
+    printf("rate = %F\n", rate);
+    Model model = neural_net(d.train.X.cols, d.train.y.cols);
+    model.train(d.train, batch, iters, rate, momentum, decay);
+    printf("training accuracy: %lf\n", model.accuracy(d.train));
+    printf("test accuracy:     %lf\n", model.accuracy(d.test));
+  }
+  
 
   return 0;
 }
