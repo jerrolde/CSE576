@@ -13,8 +13,6 @@
 //  A Matrix containing the activated output.
 Matrix forward_linear(const Matrix &matrix) {
   Matrix activated = matrix;
-  // TODO: Implement forward activation.
-  NOT_IMPLEMENTED();
   return activated;
 }
 
@@ -27,8 +25,6 @@ Matrix forward_linear(const Matrix &matrix) {
 Matrix backward_linear(const Matrix &out, const Matrix &prev_grad) {
   assert_same_size(prev_grad, out);
   Matrix grad = prev_grad;
-  // TODO: Implement activation backward pass.
-  NOT_IMPLEMENTED();
   return grad;
 }
 
@@ -39,9 +35,12 @@ Matrix backward_linear(const Matrix &out, const Matrix &prev_grad) {
 //  A Matrix containing the activated output.
 Matrix forward_logistic(const Matrix &matrix) {
   Matrix activated = matrix;
-  // TODO: Implement forward activation.
-  // Hint: look at matrix.h, it might save you some typing.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < activated.rows * activated.cols; i++)
+  {
+    double x = activated.begin()[i];
+    double fx = 1.0 / (1.0 + exp(-1.0 * x));
+    activated.begin()[i] = fx;
+  }
   return activated;
 }
 
@@ -54,8 +53,13 @@ Matrix forward_logistic(const Matrix &matrix) {
 Matrix backward_logistic(const Matrix &out, const Matrix &prev_grad) {
   assert_same_size(prev_grad, out);
   Matrix grad = prev_grad;
-  // TODO: Implement activation backward pass.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < grad.rows * grad.cols; i++)
+  {
+    double next = grad.begin()[i];
+    double f = out.begin()[i];
+    double fdot = f * (1.0 - f);
+    grad.begin()[i] = next * fdot;
+  }
   return grad;
 }
 
@@ -66,8 +70,12 @@ Matrix backward_logistic(const Matrix &out, const Matrix &prev_grad) {
 //  A Matrix containing the activated output.
 Matrix forward_tanh(const Matrix &matrix) {
   Matrix activated = matrix;
-  // TODO: Implement forward activation.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < activated.rows * activated.cols; i++)
+  {
+    double x = activated.begin()[i];
+    double fx = tanh(x);
+    activated.begin()[i] = fx;
+  }
   return activated;
 }
 
@@ -80,8 +88,13 @@ Matrix forward_tanh(const Matrix &matrix) {
 Matrix backward_tanh(const Matrix &out, const Matrix &prev_grad) {
   assert_same_size(prev_grad, out);
   Matrix grad = prev_grad;
-  // TODO: Implement activation backward pass.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < grad.rows * grad.cols; i++)
+  {
+    double next = grad.begin()[i];
+    double f = out.begin()[i];
+    double fdot = 1 - pow(f, 2);
+    grad.begin()[i] = next * fdot;
+  }
   return grad;
 }
 
@@ -91,9 +104,13 @@ Matrix backward_tanh(const Matrix &out, const Matrix &prev_grad) {
 // Returns:
 //  A Matrix containing the activated output.
 Matrix forward_relu(const Matrix &matrix) {
-  // TODO: Implement forward activation.
   Matrix activated = matrix;
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < activated.rows * activated.cols; i++)
+  {
+    double x = activated.begin()[i];
+    double fx = x > 0.0 ? x : 0.0;
+    activated.begin()[i] = fx;
+  }
   return activated;
 }
 
@@ -106,8 +123,13 @@ Matrix forward_relu(const Matrix &matrix) {
 Matrix backward_relu(const Matrix &out, const Matrix &prev_grad) {
   assert_same_size(prev_grad, out);
   Matrix grad = prev_grad;
-  // TODO: Implement activation backward pass.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < grad.rows * grad.cols; i++)
+  {
+    double next = grad.begin()[i];
+    double f = out.begin()[i];
+    double fdot = f < 0.0 ? 0.0 : 1.0;
+    grad.begin()[i] = next * fdot;
+  }
   return grad;
 }
 
@@ -118,8 +140,12 @@ Matrix backward_relu(const Matrix &out, const Matrix &prev_grad) {
 // Returns:
 Matrix forward_lrelu(const Matrix &matrix) {
   Matrix activated = matrix;
-  // TODO: Implement forward activation.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < activated.rows * activated.cols; i++)
+  {
+    double x = activated.begin()[i];
+    double fx = x > 0.0 ? x : 0.01 * x;
+    activated.begin()[i] = fx;
+  }
   return activated;
 }
 
@@ -132,8 +158,13 @@ Matrix forward_lrelu(const Matrix &matrix) {
 Matrix backward_lrelu(const Matrix &out, const Matrix &prev_grad) {
   assert_same_size(prev_grad, out);
   Matrix grad = prev_grad;
-  // TODO: Implement activation backward pass.
-  NOT_IMPLEMENTED();
+  for (long i = 0; i < grad.rows * grad.cols; i++)
+  {
+    double next = grad.begin()[i];
+    double f = out.begin()[i];
+    double fdot = f < 0.0 ? 0.01 : 1.0;
+    grad.begin()[i] = next * fdot;
+  }
   return grad;
 }
 
@@ -143,8 +174,23 @@ Matrix backward_lrelu(const Matrix &out, const Matrix &prev_grad) {
 // Returns:
 Matrix forward_softmax(const Matrix &matrix) {
   Matrix activated = matrix;
-  // TODO: Implement forward activation.
-  NOT_IMPLEMENTED();
+  for (int i = 0; i < activated.rows; i++)
+  {
+    double sum = 0;
+    for (int j = 0; j < activated.cols; j++)
+    {
+      double x = activated[i][j];
+      double fx = exp(x);
+      sum += fx;
+      activated[i][j] = fx;
+    }
+    for (int j = 0; j < activated.cols; j++)
+    {
+      double x = activated[i][j];
+      double fx = x / sum;
+      activated[i][j] = fx;
+    }
+  }
   return activated;
 }
 
@@ -157,14 +203,13 @@ Matrix forward_softmax(const Matrix &matrix) {
 Matrix softmax_jacobian(const Matrix &out_row) {
   assert(out_row.rows == 1);
   Matrix jacobian(out_row.cols, out_row.cols);
-  // TODO: Implement the Jacobian matrix.
-  // Do whatever you want here, but here's some structure to get you started.
-  for (int j = 0; j < out_row.cols; j++) {
-    for (int k = 0; k < out_row.cols; k++) {
-      NOT_IMPLEMENTED();
-      // jacobian(j, k) = ...
+  for (int i = 0; i < out_row.cols; i++) {
+    for (int j = 0; j < out_row.cols; j++) {
+      if (i == j) jacobian[i][j] = out_row[0][j];
     }
   }
+  jacobian = jacobian - (out_row.transpose() * out_row);
+
   assert(jacobian.rows == out_row.cols);
   assert(jacobian.cols == out_row.cols);
   return jacobian;
@@ -172,16 +217,18 @@ Matrix softmax_jacobian(const Matrix &out_row) {
 
 // Computes the backwards pass for the softmax function.
 Matrix backward_softmax(const Matrix &out, const Matrix &prev_grad) {
+  printf("backward softmax\n");
   assert_same_size(prev_grad, out);
-  // TODO: Implement activation backward pass.
   Matrix grad = prev_grad;
   // Multiply previous gradient with Jacobian.
   for (int i = 0; i < out.rows; i++) {
     Matrix jacobian = softmax_jacobian(out.get_row(i));
     Matrix row_grad = prev_grad.get_row(i);
-    // TODO: Implement the softmax backward pass.
-    NOT_IMPLEMENTED();
-    // grad(i, j) = ...
+    Matrix product = row_grad * jacobian;
+    for (int j = 0; j < out.cols; j++)
+    {
+      grad[i][j] =  product[0][j];
+    }
   }
   return grad;
 }

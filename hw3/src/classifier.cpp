@@ -29,9 +29,7 @@ void debug_print(const char *name, const Matrix &m, int max_rows = 2, int max_co
 // const Matrix& in: input to layer
 // returns: matrix that is output before the activation layer
 Matrix forward_weights(const Layer &l, const Matrix &in) {
-  Matrix output;
-  // TODO: Multiply input by weights and return the result
-  NOT_IMPLEMENTED();
+  Matrix output = in * l.w;
 
   assert(output.rows == in.rows);
   assert(output.cols == l.w.cols);
@@ -42,10 +40,7 @@ Matrix forward_weights(const Layer &l, const Matrix &in) {
 // const Matrix& out1: output before activation
 // returns: matrix that is output of the layer after activation
 Matrix forward_activation(const Layer &l, const Matrix &out1) {
-  Matrix output;
-  // TODO: Apply activation function and return
-  // Hint: Use forward_activate_matrix in activations.cpp.
-  NOT_IMPLEMENTED();
+  Matrix output = forward_activate_matrix(out1, l.activation);
 
   return output;
 }
@@ -72,7 +67,7 @@ Matrix Layer::forward(const Matrix &in) {
 // const Matrix& grad_y: partial derivative of loss w.r.t. output of layer
 // returns: Matrix, partial derivative of loss w.r.t. input to (xw)
 Matrix backward_xw(const Layer &l, const Matrix &grad_y) {
-  Matrix grad_xw;
+  
   // TODO (1.4.1): compute dL/d(xw) and return it
   // Hint:
   //  grad_y is dL/dy
@@ -80,7 +75,7 @@ Matrix backward_xw(const Layer &l, const Matrix &grad_y) {
   //           = dL/dy * df(xw)/d(xw)
   //           = dL/dy * f'(xw)
   // Hint: Use backward_activate_matrix in activations.cpp.
-  NOT_IMPLEMENTED();
+  Matrix grad_xw = backward_activate_matrix(l.out2, grad_y, l.activation);
 
   return grad_xw;
 }
@@ -92,9 +87,8 @@ Matrix backward_w(const Layer &l) {
   // TODO (1.4.2): then calculate dL/dw and return it
   // Hint:
   //  dL/dw = d(xw)/dw * dL/d(xw) = x * dL/d(xw)
-  Matrix grad_w;
-  NOT_IMPLEMENTED();
-
+  Matrix grad_w = l.in.transpose() * l.grad_out1;
+  
   assert_same_size(grad_w, l.w);
   return grad_w;
 }
@@ -104,9 +98,7 @@ Matrix backward_w(const Layer &l) {
 Matrix backward_x(const Layer &l) {
   // Get the relevant quantities from the layer (see forward() and backward() function for reference)
   // TODO (1.4.3): finally, calculate dL/dx and return it
-  Matrix grad_x;
-  NOT_IMPLEMENTED();
-
+  Matrix grad_x = l.grad_out1* l.w.transpose();
   assert_same_size(grad_x, l.in);
   return grad_x;
 }
