@@ -68,15 +68,31 @@ Image mark_corners(const Image& im, const vector<Descriptor>& d)
 // returns: single row Image of the filter.
 Image make_1d_gaussian(float sigma)
   {
-  // TODO: make separable 1d Gaussian.
   
-  NOT_IMPLEMENTED();
+  Image ret;
+  int w;
+  w = 6 * sigma;
+  if (!(w % 2))
+    w++;
+
+  ret = Image(w, 1, 1);
+
+  float pixel;
+  int x2;
+
+  for (int i = 0; i < w; i++)
+  {
+      x2 = w / 2 - i;
+      pixel = 1.0 / (sqrt(2 * M_PI) * (sigma));
+      pixel = pixel * exp((-pow(x2, 2)) / (2 * powf(sigma, 2)));
+      ret.set_pixel(i, 0, 0, pixel);
+  }
   
-  Image lin(1,1); // set to proper dimension
-  lin.data[0]=1;
+  // Image lin(1,1); // set to proper dimension
+  // lin.data[0]=1;
   
   
-  return lin;
+  return ret;
   }
 
 // HW5 1.1b
@@ -90,9 +106,12 @@ Image smooth_image(const Image& im, float sigma)
   // Hint: to make the filter from vertical to horizontal or vice versa
   // use "swap(filter.h,filter.w)"
   
-  NOT_IMPLEMENTED();
-  
-  return im;
+  Image filter = make_1d_gaussian(sigma);
+  Image ret = convolve_image(im, filter, 1);
+  filter.h = filter.w;
+  filter.w = 1;
+  ret = convolve_image(ret, filter, 1);
+  return ret;
   }
 
 
@@ -113,11 +132,22 @@ Image structure_matrix(const Image& im2, float sigma)
   else im=rgb_to_grayscale(im2);
   
   Image S(im.w, im.h, 3);
-  // TODO: calculate structure matrix for im.
-  
-  NOT_IMPLEMENTED();
-  
-  return S;
+
+  Image Ix, Iy;
+  Ix = convolve_image(im, make_gx_filter(), 0);
+  Iy = convolve_image(im, make_gy_filter(), 0);
+
+  for (int i = 0; i < im.w; i++)
+  {
+    for (int j = 0; j < im.h; j++)
+    {
+      S(i, j, 0) = Ix(i, j, 0) * Ix(i, j, 0);
+      S(i, j, 1) = Iy(i, j, 0) * Iy(i, j, 0);
+      S(i, j, 2) = Ix(i, j, 0) * Iy(i, j, 0);
+    }
+  }
+
+  return smooth_image(S, sigma);
   }
 
 
@@ -131,8 +161,27 @@ Image cornerness_response(const Image& S, int method)
   // TODO: fill in R, "cornerness" for each pixel using the structure matrix.
   // We'll use formulation det(S) - alpha * trace(S)^2, alpha = .06.
   // E(S) = det(S) / trace(S)
-  
-  NOT_IMPLEMENTED();
+  if (method == 1)
+  {
+    // method = 1 (exact 2nd eigenvalue) is optional
+    NOT_IMPLEMENTED();
+  }
+  else
+  {
+    //method = 0 (det(S)/tr(S))
+
+    float det, tr;
+    for (int i = 0; i < S.w; i++)
+    {
+      for (int j = 0; j < S.h; j++)
+      {
+        det = (S(i, j, 0) * S(i, j, 1)) - (S(i, j, 2) * S(i, j, 2));
+        tr = S(i, j, 0) + S(i, j, 1);
+        R(i, j, 0) = det / tr;
+        //R(i, j, 0) = det - 0.06 * tr * tr; // comment says I should use this?
+      }
+    }
+  }
   
   return R;
   }
@@ -153,7 +202,28 @@ Image nms_image(const Image& im, int w)
   //         if neighbor response greater than pixel response:
   //             set response to be very low
   
-  NOT_IMPLEMENTED();
+  for (int i = 0; i < im.w; i++)
+  {
+    for (int j = 0; j < im.h; j++)
+    {
+      float val = im(i, j, 0);
+
+      //check 2w+1 window around val
+      for (int ii = -w; ii <= w; ii++)
+      {
+        for (int jj = -w; jj <= w; jj++)
+        {
+          // do nothing when out of bounds
+          if ((i + ii >= 0) && (j + jj >= 0) && (i + ii < im.w) && (j + jj < im.h))
+          {
+            float neighbor = im(i + ii, j + jj, 0);
+            if (neighbor > val) r(i, j, 0) = -9999;
+          }
+          
+        }
+      }
+    }
+  }
   
   return r;
   }
@@ -171,7 +241,16 @@ vector<Descriptor> detect_corners(const Image& im, const Image& nms, float thres
   //TODO: count number of responses over threshold (corners)
   //TODO: and fill in vector<Descriptor> with descriptors of corners, use describe_index.
   
-  NOT_IMPLEMENTED();
+  for (int i = 0; i < im.w; i++)
+  {
+    for (int j = 0; j < im.h; j++)
+    {
+      if (nms(i, j, 0) >= thresh)
+      {
+        d.push_back(describe_index(im, i, j, window));
+      }
+    }
+  }
   
   return d;
   }

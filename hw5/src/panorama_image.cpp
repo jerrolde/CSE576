@@ -124,11 +124,13 @@ float l1_distance(const vector<float>& a,const vector<float>& b)
   {
   assert(a.size()==b.size() && "Arrays must have same size\n");
   
-  // TODO: return the correct number.
-  
-  NOT_IMPLEMENTED();
-  
-  return 0;
+  float l1;
+  l1 = 0.0;
+  for (int i = 0; i <(int) a.size(); i++)
+  {
+    l1 += fabs(a[i] - b[i]);
+  }
+  return l1;
   }
 
 // HW5 2.2a
@@ -140,13 +142,24 @@ vector<int> match_descriptors_a2b(const vector<Descriptor>& a, const vector<Desc
   vector<int> ind;
   for(int j=0;j<(int)a.size();j++)
     {
-    int bind = -1; // <- find the best match (-1: no match)
+    int b_index = -1; // <- find the best match (-1: no match) (changed name)
     float best_distance=1e10f;  // <- best distance
     
     // TODO: find the best 'bind' descriptor in b that best matches a[j]
     // TODO: put your code here:
+
+    // for each element in a, check distance with each element in b
+    for (int i = 0; i < (int)b.size(); i++)
+    {
+      float distance = l1_distance(a[j].data, b[i].data);
+      if (distance < best_distance)
+      {
+        best_distance = distance;
+        b_index = i;
+      }
+    }
     
-    NOT_IMPLEMENTED();
+    ind.push_back(b_index);
     }
   return ind;
   
@@ -167,7 +180,25 @@ vector<Match> match_descriptors(const vector<Descriptor>& a, const vector<Descri
   // TODO: use match_descriptors_a2b(a,b) and match_descriptors_a2b(b,a)
   // and populate `m` with good matches!
   
-  NOT_IMPLEMENTED();
+  vector<int> ab, ba;
+  ab = match_descriptors_a2b(a, b);
+  ba = match_descriptors_a2b(b, a);
+
+  for (int i = 0; i < (int) ab.size(); i++)
+  {
+    if (ab[i] >= 0)
+    {
+      // create match for the descriptor at a[i]
+      // the match in b is at index ab[i]
+      Match match(&a[i], &b[ab[i]]);
+      match.distance = l1_distance(a[i].data, b[ab[i]].data);
+      if (ba[ab[i]] == i)
+      {
+        //printf("%f %f %f %f\n", (*match.a).p.x, (*match.a).p.y, (*match.b).p.x, (*match.b).p.y);
+        m.push_back(match);
+      }
+    }
+  }
   
   return m;
   }
