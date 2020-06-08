@@ -25,28 +25,36 @@ float Image::pixel_nearest(float x, float y, int c) const
 // returns the bilinearly interpolated pixel (x,y,c)
 float Image::pixel_bilinear(float x, float y, int c) const
   {
-  // Since you are inside class Image you can
-  // use the member function pixel(a,b,c)
-  
-  // referencing http://supercomputingblog.com/graphics/coding-bilinear-interpolation/
-  int x1, x2, y1, y2;
-  float q12, q22, q11, q21;
-  float r2, r1, p;
+    int x2 = ceil(x);
+    int x1 = floor(x);
+    int y1 = ceil(y);
+    int y2 = floor(y);
 
-  x1 = floor(x);
-  x2 = ceil(x);
-  y1 = ceil(y);
-  y2 = floor(y);
+    float dx1 = x - x1;
+    float dx2 = x2 - x;
+    float dy1 = y - y2;
+    float dy2 = y1 - y;
 
-  q12 = clamped_pixel(x1, y2, c);
-  q22 = clamped_pixel(x2, y2, c);
-  q11 = clamped_pixel(x1, y1, c);
-  q21 = clamped_pixel(x2, y1, c);
-  r1 = ((x2 - x) / (x2 - x1)) * q11 + ((x - x1) / (x2 - x1)) * q21;
-  r2 = ((x2 - x) / (x2 - x1)) * q12 + ((x - x1) / (x2 - x1)) * q22;
-  p = ((y2 - y) / (y2 - y1)) * r1 + ((y - y1) / (y2 - y1)) * r2;
-  
-  return p;
+    float areaUL = dx1 * dy1;
+    float areaUR = dx2 * dy1;
+    float areaLL = dx1 * dy2;
+    float areaLR = dx2 * dy2;
+
+    float UL = clamped_pixel(x1, y2, c);
+    float UR = clamped_pixel(x2, y2, c);
+    float LL = clamped_pixel(x1, y1, c);
+    float LR = clamped_pixel(x2, y1, c);
+
+    if (x2 == x1 && y1 == y2) {
+      return UL;
+    } else if (x2 == x1) {
+      return dy1 * LL + dy2 * UL;
+    } else if (y1 == y2) {
+      return dx1 * UL + dx2 * UR;
+    } else {
+      return UL * areaLR + UR * areaLL + LL * areaUR + LR * areaUL;
+    }
+
   }
 
 // HW1 #1
